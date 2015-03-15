@@ -1,0 +1,49 @@
+#!/bin/bash
+ 
+setting keuboard layout /usr/share/X11/xkb/rules/base.lst
+setxkbmap es
+ 
+xset +fp /usr/share/fonts/local
+xset fp rehash
+ 
+feh --bg-scale /home/richi/Imágenes/Wallpapers/gunter.jpg &
+
+nm-applet &
+.dropbox-dist/dropboxd &
+parcellite &
+xfce4-volumed &
+
+# compton &
+
+while true; do
+
+# Power/Battery Status
+if [ "$( cat /sys/class/power_supply/AC/online )" -eq "1" ]; then
+        DWM_BATTERY="AC";
+        DWM_RENEW_INT=3;
+else
+        DWM_BATTERY=$(( `cat /sys/class/power_supply/BAT0/charge_now` * 100 / `cat /sys/class/power_supply/BAT0/charge_full` ));
+        DWM_RENEW_INT=30;
+fi;
+
+# Wi-Fi eSSID
+if [ "$( cat /sys/class/net/eth0/carrier )" -eq "0" ]; then
+		  DWM_ESSID=$( /sbin/iwgetid -r ); 
+else
+		  DWM_ESSID="OFF";
+fi;
+
+# Volume Level
+DWM_VOL=$( amixer -c0 sget Master | awk -vORS=' ' '/Mono:/ {print($6$4)}' | sed 's/ $/''/' );
+
+# Date and Time
+DWM_CLOCK=$( date '+%e %b %Y %a | %k:%M' | sed 's/^ /''/');
+
+# Overall output command
+DWM_STATUS="WiFi: [$DWM_ESSID] | Power: [$DWM_BATTERY] | Vol: $DWM_VOL | $DWM_CLOCK";
+xsetroot -name "$DWM_STATUS";
+sleep 3;
+
+done &
+
+exec dwm

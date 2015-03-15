@@ -1,0 +1,5 @@
+#!/bin/sh
+cd dwm && sudo make clean install
+cd ../session
+yes n | sudo cp dwm-personalized.desktop /usr/share/xsessions
+yes n | sudo cp dwm-personalized /usr/bin

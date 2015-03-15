@@ -1,0 +1,8 @@
+#!/bin/sh
+files=$(ls patches/*.diff)
+cd dwm
+cp config.def.h config.h
+for file in $files
+do
+  git apply ../$file
+done
