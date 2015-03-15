@@ -2,6 +2,7 @@
 files=$(ls patches/*.diff)
 cd dwm
 cp config.def.h config.h
+echo "Patching..."
 for file in $files
 do
   git apply ../$file

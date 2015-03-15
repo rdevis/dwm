@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ ! -e dwm/config.h ]; then
+  ./patch
+fi
+echo "Installing..."
 cd dwm && sudo make clean install
 cd ../session
 yes n | sudo cp dwm-personalized.desktop /usr/share/xsessions
