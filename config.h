@@ -1,5 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
+#define TERMINAL "lxterminal"
+
 #include <X11/XF86keysym.h>
 
 /* appearance */
@@ -59,7 +61,7 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
-static const char *termcmd[]  = { "lxterminal", NULL };
+static const char *termcmd[]  = { TERMINAL, NULL };
 static const char *web1[]  = { "chromium", NULL };
 static const char *web2[]  = { "dwb", NULL };
 static const char *editor[]  = { "subl3", NULL };
@@ -67,6 +69,10 @@ static const char *explorer[]  = { "thunar", NULL };
 static const char *volumeup[]  = { "amixer", "set", "-q", "Master", "playback", "5%+", NULL };
 static const char *volumedown[]  = { "amixer", "set", "-q", "Master", "playback", "5%-", NULL };
 static const char *mute[]       = { "amixer", "set", "-q", "Master", "toggle", NULL };
+static const char *youtube[] = { TERMINAL, "-t", "Youtube", "-e", "mpsyt", NULL };
+static const char *email[] = { TERMINAL, "-t", "E-mail", "-e", "mutt", NULL };
+static const char *twitter[] = { TERMINAL, "-t", "Twitter", "-e", "rainbowstream", NULL };
+static const char *mc[] = { TERMINAL, "-t", "Midnight Commander", "-e", "mc", NULL };
 
 static Key keys[] = {
 	/* modifier                     key                        function        argument */
@@ -76,6 +82,10 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_w,                      spawn,          {.v = web2 } },
 	{ MODKEY,                       XK_e,                      spawn,          {.v = editor } },
 	{ MODKEY,                       XK_f,                      spawn,          {.v = explorer } },
+	{ MODKEY,                       XK_y,                      spawn,          {.v = youtube } },
+	{ MODKEY,                       XK_m,                      spawn,          {.v = email } },
+	{ MODKEY,                       XK_t,                      spawn,          {.v = twitter } },
+	{ MODKEY,                       XK_c,                      spawn,          {.v = mc } },
 	{ MODKEY,                       XK_Up,                     spawn,          {.v = volumeup } },
 	{ MODKEY,                       XK_Down,                   spawn,          {.v = volumedown } },
 	{ MODKEY,                       XK_s,                      swapfocus,      {0} },
@@ -103,9 +113,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period,                 focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,                  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period,                 tagmon,         {.i = +1 } },
-    { 0,                            XF86XK_AudioLowerVolume,   spawn,          {.v = volumedown } },
-    { 0,                            XF86XK_AudioRaiseVolume,   spawn,          {.v = volumeup } },
-    { 0,                            XF86XK_AudioMute,          spawn,          {.v = mute } },
+  { 0,                            XF86XK_AudioLowerVolume,   spawn,          {.v = volumedown } },
+  { 0,                            XF86XK_AudioRaiseVolume,   spawn,          {.v = volumeup } },
+  { 0,                            XF86XK_AudioMute,          spawn,          {.v = mute } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
