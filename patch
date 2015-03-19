@@ -2,8 +2,10 @@
 files=$(ls patches/*.diff)
 cp config.h dwm/
 cd dwm
+sed -i s/BSD/DEFAULT/ config.mk
 echo "Patching..."
 for file in $files
 do
   git apply ../$file
 done
+echo "Done."

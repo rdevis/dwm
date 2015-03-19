@@ -1,0 +1,111 @@
+diff --git a/config.def.h b/config.def.h
+index 875885b..8206dd4 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -30,6 +30,7 @@ static const Rule rules[] = {
+ static const float mfact      = 0.55; /* factor of master area size [0.05..0.95] */
+ static const int nmaster      = 1;    /* number of clients in master area */
+ static const Bool resizehints = True; /* True means respect size hints in tiled resizals */
++static const float popuptermmfact = 0.15; /* factor of master area size for pop-up terminal height [0.05..0.95] */
+ 
+ static const Layout layouts[] = {
+ 	/* symbol     arrange function */
+@@ -52,6 +53,8 @@ static const Layout layouts[] = {
+ /* commands */
+ static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
+ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
++static const char popuptermname[] = "pop-up";
++static const char *popuptermcmd[] = { "xterm", "-title", popuptermname, NULL };
+ static const char *termcmd[]  = { "st", NULL };
+ 
+ static Key keys[] = {
+@@ -89,6 +92,7 @@ static Key keys[] = {
+ 	TAGKEYS(                        XK_8,                      7)
+ 	TAGKEYS(                        XK_9,                      8)
+ 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
++    { MODKEY,                       XK_grave,  togglepopup,    {.v = popuptermcmd } },
+ };
+ 
+ /* button definitions */
+diff --git a/dwm.c b/dwm.c
+index f896170..14b69ad 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -232,6 +232,7 @@ static int xerror(Display *dpy, XErrorEvent *ee);
+ static int xerrordummy(Display *dpy, XErrorEvent *ee);
+ static int xerrorstart(Display *dpy, XErrorEvent *ee);
+ static void zoom(const Arg *arg);
++static void togglepopup(const Arg *arg);
+ 
+ /* variables */
+ static Client *prevclient = NULL;
+@@ -269,6 +270,7 @@ static Window root;
+ 
+ /* configuration, allows nested code to access above variables */
+ #include "config.h"
++static unsigned int popuptag = 1 << LENGTH(tags);
+
+ struct Pertag {
+ 	unsigned int curtag, prevtag; /* current and previous tag */
+@@ -340,7 +342,7 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, Bool interact) {
+ 		*h = bh;
+ 	if(*w < bh)
+ 		*w = bh;
+-	if(resizehints || c->isfloating || !c->mon->lt[c->mon->sellt]->arrange) {
++    if(strcmp(c->name, popuptermname) && (resizehints || c->isfloating || !c->mon->lt[c->mon->sellt]->arrange)) {
+ 		/* see last two sentences in ICCCM 4.1.2.3 */
+ 		baseismin = c->basew == c->minw && c->baseh == c->minh;
+ 		if(!baseismin) { /* temporarily remove base dimensions */
+@@ -1038,6 +1040,15 @@ manage(Window w, XWindowAttributes *wa) {
+ 	           && (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
+ 	c->bw = borderpx;
+ 
++	if(!strcmp(c->name, popuptermname)) {
++	    c->mon->tagset[c->mon->seltags] |= c->tags = popuptag;
++	    c->isfloating = True;
++	    c->h = c->mon->wh * popuptermmfact;
++		resize(c, c->mon->wx, c->mon->wy + c->mon->wh - c->h, c->mon->ww - 2 * c->bw, c->h - 2 * c->bw, False);
++	}
++	else
++	    c->tags &= TAGMASK;
++
+ 	wc.border_width = c->bw;
+ 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
+ 	XSetWindowBorder(dpy, w, scheme[SchemeNorm].border->pix);
+@@ -1057,6 +1068,7 @@ manage(Window w, XWindowAttributes *wa) {
+ 	                (unsigned char *) &(c->win), 1);
+ 	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
+ 	setclientstate(c, NormalState);
++
+ 	if (c->mon == selmon)
+ 		unfocus(selmon->sel, False);
+ 	c->mon->sel = c;
+@@ -2052,6 +2064,28 @@ zoom(const Arg *arg) {
+ 	pop(c);
+ }
+ 
++void
++togglepopup(const Arg *arg) {
++	Client *c = NULL;
++	unsigned int found = 0;
++
++	for(c = selmon->clients; c && !(found = c->tags & popuptag); c = c->next);
++	if(found) {
++	    unsigned int newtagset = selmon->tagset[selmon->seltags] ^ popuptag;
++	    if(newtagset) {
++	        selmon->tagset[selmon->seltags] = newtagset;
++	        focus(NULL);
++	        arrange(selmon);
++	    }
++	    if(ISVISIBLE(c)) {
++	        focus(c);
++	        restack(selmon);
++	    }
++	}
++	else
++	    spawn(arg);
++}
++
+ int
+ main(int argc, char *argv[]) {
+ 	if(argc == 2 && !strcmp("-v", argv[1]))

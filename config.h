@@ -39,6 +39,7 @@ static const Rule rules[] = {
 static const float mfact      = 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster      = 1;    /* number of clients in master area */
 static const Bool resizehints = False; /* True means respect size hints in tiled resizals */
+static const float popuptermmfact = 0.32; /* factor of master area size for pop-up terminal height [0.05..0.95] */
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
@@ -61,6 +62,8 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
+static const char popuptermname[] = "pop-up";
+static const char *popuptermcmd[] = { TERMINAL, "--title", popuptermname, NULL };
 static const char *termcmd[]  = { TERMINAL, NULL };
 static const char *web1[]  = { "chromium", NULL };
 static const char *web2[]  = { "dwb", NULL };
@@ -113,9 +116,9 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period,                 focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,                  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period,                 tagmon,         {.i = +1 } },
-  { 0,                            XF86XK_AudioLowerVolume,   spawn,          {.v = volumedown } },
-  { 0,                            XF86XK_AudioRaiseVolume,   spawn,          {.v = volumeup } },
-  { 0,                            XF86XK_AudioMute,          spawn,          {.v = mute } },
+	{ 0,                            XF86XK_AudioLowerVolume,   spawn,          {.v = volumedown } },
+	{ 0,                            XF86XK_AudioRaiseVolume,   spawn,          {.v = volumeup } },
+	{ 0,                            XF86XK_AudioMute,          spawn,          {.v = mute } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -125,7 +128,8 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	{ MODKEY|ShiftMask,             XK_q,                      quit,           {0} },
+	{ MODKEY,                       XK_masculine,              togglepopup,    {.v = popuptermcmd } },
 };
 
 /* button definitions */
