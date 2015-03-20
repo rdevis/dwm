@@ -5,5 +5,11 @@ fi
 echo "Installing..."
 cd dwm && sudo make clean install
 cd ../session
-yes n | sudo cp dwm-personalized.desktop /usr/share/xsessions
-yes n | sudo cp dwm-personalized /usr/bin
+
+if [ ! -e /usr/share/xsessions/dwm-personalized.desktop ]; then
+  sudo cp dwm-personalized.desktop /usr/share/xsessions
+fi
+
+if [ ! -e /usr/bin/dwm-personalized ]; then
+  sudo cp dwm-personalized /usr/bin
+fi
