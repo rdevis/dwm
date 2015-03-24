@@ -37,7 +37,6 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            True,        -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       False,       -1 },
 };
 
 /* layout(s) */
@@ -70,7 +69,7 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont,
 static const char popuptermname[] = "pop-up";
 static const char *popuptermcmd[] = { TERMINAL, "-t", popuptermname, NULL };
 static const char *termcmd[]  = { TERMINAL, NULL };
-static const char *web1[]  = { "chromium", NULL };
+static const char *web1[]  = { "firefox", NULL };
 static const char *web2[]  = { "dwb", NULL };
 static const char *editor[]  = { "subl3", NULL };
 static const char *explorer[]  = { "thunar", NULL };
