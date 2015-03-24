@@ -1,0 +1,52 @@
+URL: http://dwm.suckless.org/patches/push
+pushup and pushdown provide a way to move clients inside the clients list.
+
+Index: dwm/push.c
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ dwm/push.c	2014-02-09 15:24:21.652117230 +0100
+@@ -0,0 +1,44 @@
++static Client *
++prevtiled(Client *c) {
++	Client *p, *r;
++
++	for(p = selmon->clients, r = NULL; p && p != c; p = p->next)
++		if(!p->isfloating && ISVISIBLE(p))
++			r = p;
++	return r;
++}
++
++static void
++pushup(const Arg *arg) {
++	Client *sel = selmon->sel;
++	Client *c;
++
++	if(!sel || sel->isfloating)
++		return;
++	if((c = prevtiled(sel)) && c != nexttiled(selmon->clients)) {
++		/* attach before c */
++		detach(sel);
++		sel->next = c;
++		for(c = selmon->clients; c->next != sel->next; c = c->next);
++			c->next = sel;
++	}
++	focus(sel);
++	arrange(selmon);
++}
++
++static void
++pushdown(const Arg *arg) {
++	Client *sel = selmon->sel;
++	Client *c;
++
++	if(!sel || sel->isfloating || sel == nexttiled(selmon->clients))
++		return;
++	if((c = nexttiled(sel->next))) {
++		/* attach after c */
++		detach(sel);
++		sel->next = c->next;
++		c->next = sel;
++	}
++	focus(sel);
++	arrange(selmon);
++}
