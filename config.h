@@ -1,15 +1,19 @@
 /* See LICENSE file for copyright and license details. */
 
-#define TERMINAL "lxterminal"
+#define TERMINAL "xfce4-terminal"
+#define TERMINAL_CLASS "Xfce4-terminal"
 
 #include "push.c"
 #include <X11/XF86keysym.h>
 
 /* appearance */
 static const char *fonts[] = {
-    "Sans:size=10.5",
+//    "Sans:size=10.5",
+    "Liberation Mono:size=10.5",
     "VL Gothic:size=10.5",
     "WenQuanYi Micro Hei:size=10.5",
+    "FontAwesome:size=10.5",
+    "GLYPHICONS Halflings:size=10.5",
 };
 static const char dmenufont[] = "-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*";
 static const char normbordercolor[] = "#444444";
@@ -18,7 +22,7 @@ static const char normfgcolor[]     = "#bbbbbb";
 static const char selbordercolor[]  = "#005577";
 static const char selbgcolor[]      = "#005577";
 static const char selfgcolor[]      = "#eeeeee";
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing = 2;   /* systray spacing */
@@ -28,15 +32,23 @@ static const Bool showbar           = True;     /* False means no bar */
 static const Bool topbar            = True;     /* False means bottom bar */
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+//1 internet, 2 terminals 3 code 4 social 5 pics/videos 6 files 7 docs
+static const char *tags[] = { "", "", "", "", "", "", "" };
 
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            True,        -1 },
+	/* class            instance    title       tags mask     isfloating   monitor */
+	{ "Gimp",           NULL,       NULL,       0,            True,        -1 },
+	{ "Chromium",       NULL,       NULL,       1,            False,       -1 },
+	{ "Subl3",          NULL,       NULL,       1 << 2,       False,       -1 },
+	{ "Thunar",         NULL,       NULL,       1 << 5,       False,       -1 },
+	{ TERMINAL_CLASS,   NULL,       "Terminal", 0,            False,       -1 },
+	{ TERMINAL_CLASS,   NULL,       "Youtube",  1 << 3,       False,       -1 },
+	{ TERMINAL_CLASS,   NULL,       "E-mail",   1 << 3,       False,       -1 },
+	{ TERMINAL_CLASS,   NULL,       "Twitter",  1 << 3,       False,       -1 },
 };
 
 /* layout(s) */
@@ -47,16 +59,16 @@ static const float popuptermmfact = 0.32; /* factor of master area size for pop-
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ "[M]",      monocle },
+	{ " ",      tile },    /* first entry is default */
+	{ " ",      NULL },    /* no layout function means floating behavior */
+	{ " ",      monocle },
 };
 
 /* key definitions */
 #define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
-	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
-	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
+	{ MODKEY|ControlMask,           KEY,      view,           {.ui = 1 << TAG} }, \
+	{ MODKEY,                       KEY,      toggleview,     {.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
@@ -66,20 +78,20 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
-static const char popuptermname[] = "pop-up";
-static const char *popuptermcmd[] = { TERMINAL, "-t", popuptermname, NULL };
+//static const char *dmenucmd[] = { "dmenu_run", "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]  = { TERMINAL, NULL };
-static const char *web1[]  = { "firefox", NULL };
+static const char *quake[]  = { TERMINAL, "--drop-down", NULL };
+static const char *web1[]  = { "chromium", NULL };
 static const char *web2[]  = { "dwb", NULL };
 static const char *editor[]  = { "subl3", NULL };
 static const char *explorer[]  = { "thunar", NULL };
 static const char *volumeup[]  = { "amixer", "set", "-q", "Master", "playback", "5%+", NULL };
 static const char *volumedown[]  = { "amixer", "set", "-q", "Master", "playback", "5%-", NULL };
 static const char *mute[]       = { "amixer", "set", "-q", "Master", "toggle", NULL };
-static const char *youtube[] = { TERMINAL, "-t", "Youtube", "-e", "mpsyt", NULL };
-static const char *email[] = { TERMINAL, "-t", "E-mail", "-e", "mutt", NULL };
-static const char *twitter[] = { TERMINAL, "-t", "Twitter", "-e", "rainbowstream", NULL };
-static const char *mc[] = { TERMINAL, "-t", "Midnight Commander", "-e", "mc", NULL };
+static const char *youtube[] = { TERMINAL, "-T", "Youtube", "-e", "mpsyt", NULL };
+static const char *email[] = { TERMINAL, "-T", "E-mail", "-e", "mutt", NULL };
+static const char *twitter[] = { TERMINAL, "-T", "Twitter", "-e", "rainbowstream", NULL };
+static const char *mc[] = { TERMINAL, "-T", "Midnight Commander", "-e", "mc", NULL };
 
 static Key keys[] = {
 	/* modifier                     key                        function        argument */
@@ -139,7 +151,7 @@ static Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_q,                      quit,           {0} },
-	{ MODKEY,                       XK_masculine,              togglepopup,    {.v = popuptermcmd } },
+	{ 0,                            XK_F12,                    runorraise,     {.v = quake } },
 };
 
 /* button definitions */
