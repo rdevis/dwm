@@ -60,7 +60,7 @@ static const float popuptermmfact = 0.32; /* factor of master area size for pop-
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ " ",      tile },    /* first entry is default */
-	{ " ",      NULL },    /* no layout function means floating behavior */
+	{ " ",      NULL },    /* no layout function means floating behavior */
 	{ " ",      monocle },
 };
 
