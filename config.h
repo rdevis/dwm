@@ -13,7 +13,6 @@ static const char *fonts[] = {
     "VL Gothic:size=10.5",
     "WenQuanYi Micro Hei:size=10.5",
     "FontAwesome:size=10.5",
-    "GLYPHICONS Halflings:size=10.5",
 };
 static const char dmenufont[] = "-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*";
 static const char normbordercolor[] = "#444444";
@@ -33,7 +32,7 @@ static const Bool topbar            = True;     /* False means bottom bar */
 
 /* tagging */
 //1 internet, 2 terminals 3 code 4 social 5 pics/videos 6 files 7 docs
-static const char *tags[] = { "", "", "", "", "", "", "" };
+static const char *tags[] = { "", "", "", "", "", "", "" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -49,6 +48,7 @@ static const Rule rules[] = {
 	{ TERMINAL_CLASS,   NULL,       "Youtube",  1 << 3,       False,       -1 },
 	{ TERMINAL_CLASS,   NULL,       "E-mail",   1 << 3,       False,       -1 },
 	{ TERMINAL_CLASS,   NULL,       "Twitter",  1 << 3,       False,       -1 },
+	{ "mpv",            NULL,       NULL,       ~0,           False,       -1 },
 };
 
 /* layout(s) */
